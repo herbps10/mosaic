@@ -9,7 +9,8 @@ Mosaic::Mosaic(int columns, int rows, int iHeight, int iWidth) {
 
 	numImages = numColumns * numRows;
 
-	// Resize the 2d image array
+	// The images array is used to store the images for the mosaic
+	// Resize the array to the correct size based on the number of images that will be in the mosaic
 	images.resize(numRows);
 	for(int i = 0; i < numRows; i++) {
 		images[i].resize(numColumns);
@@ -27,8 +28,6 @@ Mosaic::~Mosaic() {
  */
 void Mosaic::addImage(int column, int row, Image image) {
 	images[row][column] = image;
-
-	images[row][column].drawImage(column * imageWidth, row * imageHeight);
 }
 
 /*
@@ -36,9 +35,11 @@ void Mosaic::addImage(int column, int row, Image image) {
  */
 void Mosaic::draw() {
 	for(int r = 0; r < numRows; r++) {
-		if((r * imageHeight) < SCREEN_Y) {
+		// Make sure we don't overrun the screen vertically. r * imageHeight gives us the upper hand coordinate of the image -- add imageHeight so we can get the lower coordinate
+		if((r * imageHeight + imageHeight) < SCREEN_Y) {
 			for(int c = 0; c < numColumns; c++) {
-				if((c * imageWidth) < SCREEN_X) {
+				// Make sure we don't run off the right edge of the screen. c * imageWidth gives us the left side coordinate, add imageWidth to get the right side
+				if((c * imageWidth + imageWidth) < SCREEN_X) {
 					images[r][c].drawImage(c * imageWidth, r * imageHeight);
 				}
 			}
