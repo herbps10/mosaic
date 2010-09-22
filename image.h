@@ -12,4 +12,6 @@ class Image {
 	void drawImage();
 	void drawImage(int xOffset, int yOffset);
 	void resizeToConfig();
+	int width();
+	int height();
 };

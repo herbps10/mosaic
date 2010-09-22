@@ -1,0 +1,1 @@
+bool fileExists(string path);

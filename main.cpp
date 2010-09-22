@@ -18,14 +18,15 @@ using namespace std;
 
 #include "config.h"
 
-#include "main.h"
-
+#include "functions.cc"
 #include "sdl.cc"
 #include "timer.cc"
 #include "image.cc"
 #include "imagecache.cc"
 #include "imagedatabase.cc"
 #include "mosaic.cc"
+
+#include "main.h"
 
 void loop() {
 	int frame = 0;
@@ -60,11 +61,33 @@ int main(int argc, char* args[]) {
 
 	ImageDatabase* database = new ImageDatabase();
 
+	mosaic("flower.jpg", database);
+
+	SDL_Delay(1000);
+
+	mosaic("blobs.jpg", database);
+
+	SDL_Delay(1000);
+
+	mosaic("flower.jpg", database);
+
+	// Loop for events
+	loop();
+
+	SDL_Quit();
+
+	return 0;
+}
+
+void mosaic(string file, ImageDatabase* database) {
+	//Clear the screen
+	SDL_FillRect(SDL::getInstance().screen, NULL, SDL_MapRGB(SDL::getInstance().screen->format, 0, 0, 0));
+
 	// Load the source image
-	CImg<int> sourceImage("flower.jpg");
+	CImg<int> sourceImage(file.c_str());
 	
-	const int SOURCE_X = sourceImage.width();
-	const int SOURCE_Y = sourceImage.height();
+	int SOURCE_X = sourceImage.width();
+	int SOURCE_Y = sourceImage.height();
 
 	Image* source = new Image();
 	source->loadCImg(sourceImage);
@@ -73,6 +96,10 @@ int main(int argc, char* args[]) {
 	int numX, numY;
 	numX = SOURCE_X / SAMPLE_X;
 	numY = SOURCE_Y / SAMPLE_Y;
+
+	// Figure out what size we need to resize the library images to in order to fit in the entire width of the source image
+	RESIZE_X = SCREEN_X / numX;
+	RESIZE_Y = RESIZE_X; // Keep the resized image square
 
 	// Explanation of parameters to Mosaic constructor
 	// numX - number of images across
@@ -94,26 +121,11 @@ int main(int argc, char* args[]) {
 		}
 	}
 
-	m->draw();
-
-	// Loop for events
-	loop();
-
-	SDL_Quit();
-
-	return 0;
+	if(DRAW_EACH == false) {
+		m->draw();
+	}
+	
+	delete m;
 }
 
-bool fileExists(string path) {
-	struct stat fileInfo;
-	int intStat;
 
-	intStat = stat(path.c_str(), &fileInfo);
-
-	if(intStat == 0) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}

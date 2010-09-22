@@ -32,7 +32,23 @@ bool ImageCache::get(string hex, int variant, Image& image) {
 		return false;
 	}
 	else {
-		image = images[hex + "-" + out.str()];
-		return true;
+		Image i = images[hex + "-" + out.str()];
+		
+		if(i.height() != RESIZE_Y || i.width() != RESIZE_X) {
+			// This means that the images in the cache are not the right size for the source image. Clear the cache so that the images will be re-loaded and re-sized.
+			clear();
+			return false;
+		}
+		else {
+			image = i;
+			return true;
+		}
 	}
+}
+
+/*
+ * Clear the cache
+ */
+void ImageCache::clear() {
+	images.clear();
 }

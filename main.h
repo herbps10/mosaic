@@ -4,4 +4,4 @@ void drawImage();
 void init();
 void loop();
 int main(int argc, char* args[]);
-bool fileExists(std::string path);
+void mosaic(string file, ImageDatabase* database);

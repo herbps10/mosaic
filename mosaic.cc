@@ -28,6 +28,11 @@ Mosaic::~Mosaic() {
  */
 void Mosaic::addImage(int column, int row, Image image) {
 	images[row][column] = image;
+
+	if(DRAW_EACH == true) {
+		image.drawImage(column * imageWidth, row * imageHeight);
+		SDL_Flip(SDL::getInstance().screen);
+	}
 }
 
 /*

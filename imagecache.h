@@ -7,4 +7,5 @@ class ImageCache {
 	void add(string hex, int variant, Image image);
 	bool get(string hex, int variant, Image& image);
 	static ImageCache &getInstance();
+	void clear();
 };

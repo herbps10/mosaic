@@ -64,3 +64,11 @@ void Image::drawImage() {
 void Image::resizeToConfig() {
 	image.resize(RESIZE_X, RESIZE_Y);
 }
+
+int Image::width() {
+	return image.width();
+}
+
+int Image::height() {
+	return image.height();
+}
