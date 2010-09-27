@@ -34,7 +34,7 @@ int Image::average(int x, int y, int w, int h) {
  * Find the color average of the whole image
  */
 int Image::average() {
-	average(0, 0, image.width(), image.height());
+	return average(0, 0, image.width(), image.height());
 }
 
 /*

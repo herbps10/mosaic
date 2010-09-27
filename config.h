@@ -15,7 +15,7 @@ int RESIZE_Y = 10;
 int SCREEN_X = 1280; 
 int SCREEN_Y = 1024; 
 
-const bool FULLSCREEN = false;
+const bool FULLSCREEN = true;
 
 // Whether to add the hex value to each image so you can see which color it is
 const bool COLOR_DEBUG = false;

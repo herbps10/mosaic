@@ -4,4 +4,4 @@ void drawImage();
 void init();
 void loop();
 int main(int argc, char* args[]);
-void mosaic(string file, ImageDatabase* database);
+void mosaic(string file, int node, int numNodes, ImageDatabase* database);

@@ -1,3 +1,4 @@
+#include "mpi.h"
 #include <vector>
 #include <iostream>
 #include <map>
@@ -29,73 +30,81 @@ using namespace std;
 #include "main.h"
 
 void loop() {
-	int frame = 0;
 	bool quit = false;
-	//Timer fps;
 	SDL_Event event;
-	while(quit == false) {
-		//fps.start();
 
+
+	while(quit == false) {
 		while(SDL_PollEvent(&event)) {
 			// This only responds to Ctrl-C as far as I can tell
 			if(event.type == SDL_QUIT) {
 				quit = true;
 			}
+			else if(event.type == SDL_KEYDOWN) {
+				char keyName = event.key.keysym.sym;
+				if(keyName == 'q' || keyName == 'Q') {
+					quit = true;
+				}
+			}
 		}
-
-		/*
-		frame++;
-
-		// Cap the frame rate if necessary
-		if(fps.get_ticks() < 1000 / FPS) {
-			SDL_Delay(1000 / FPS - fps.get_ticks());
-		}
-
-		SDL_Flip(SDL::getInstance().screen);
-		*/
 	}
 }
 
 int main(int argc, char* args[]) {
 	SDL::getInstance().init();
 
+
+	// Initialize MPI
+	MPI_Init(&argc, &args);
+
+	// Find out how many nodes there are and which one we are
+	int node, numNodes;
+	MPI_Comm_rank(MPI_COMM_WORLD, &node);
+	MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
+
+	string file = "sources/flower.jpg";
 	ImageDatabase* database = new ImageDatabase();
 
-	mosaic("flower.jpg", database);
-
-	SDL_Delay(1000);
-
-	mosaic("blobs.jpg", database);
-
-	SDL_Delay(1000);
-
-	mosaic("flower.jpg", database);
+	mosaic(file, node, numNodes, database);
 
 	// Loop for events
 	loop();
+
+	MPI_Finalize();
 
 	SDL_Quit();
 
 	return 0;
 }
 
-void mosaic(string file, ImageDatabase* database) {
+void mosaic(string file, int node, int numNodes, ImageDatabase* database) {
 	//Clear the screen
 	SDL_FillRect(SDL::getInstance().screen, NULL, SDL_MapRGB(SDL::getInstance().screen->format, 0, 0, 0));
 
 	// Load the source image
 	CImg<int> sourceImage(file.c_str());
 	
-	int SOURCE_X = sourceImage.width();
-	int SOURCE_Y = sourceImage.height();
 
 	Image* source = new Image();
 	source->loadCImg(sourceImage);
 
+	// Crop out the part of the image that this node needs to draw
+	int startX, startY, cropWidth, cropHeight, wallRow, wallColumn;
+
+	//Figure out where we are on the video wall
+	wallRow = node % 4; // This is 0 indexed, so values will range from 0-3
+	wallColumn = node / 4; // Again, 0 indexed
+
+	cropWidth = source->width() / 4;
+	cropHeight = source->height() / 4;
+
+	startX = wallColumn * cropWidth;
+	startY = wallRow * cropHeight;
+
 	// Calculate how many samples you have to take
 	int numX, numY;
-	numX = SOURCE_X / SAMPLE_X;
-	numY = SOURCE_Y / SAMPLE_Y;
+	numX = cropWidth / SAMPLE_X;
+	numY = cropHeight / SAMPLE_Y;
 
 	// Figure out what size we need to resize the library images to in order to fit in the entire width of the source image
 	RESIZE_X = SCREEN_X / numX;
@@ -127,5 +136,3 @@ void mosaic(string file, ImageDatabase* database) {
 	
 	delete m;
 }
-
-
