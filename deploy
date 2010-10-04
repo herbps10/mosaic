@@ -1,3 +1,4 @@
 for ((i = 132; i < 147; i++)) do
-	scp ./mosaic node$i:/usr/local/bin/
+	ssh node$i "mkdir -p /opt/mosaic/"
+	scp -r ./mosaic ./sources ./scraper node$i:/opt/mosaic/
 done
