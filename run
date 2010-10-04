@@ -1,0 +1,3 @@
+for ((i = 132; i < 147; i++)) do
+	ssh node$i "export DISPLAY=localhost:0; mosaic"
+done
