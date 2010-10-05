@@ -12,7 +12,7 @@ SDL &SDL::getInstance() {
 void SDL::init() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	if(FULLSCREEN == true) {
-		screen = SDL_SetVideoMode(0, 0, 32, SDL_SWSURFACE | SDL_FULLSCREEN);
+		screen = SDL_SetVideoMode(0, 0, 32, SDL_ANYFORMAT | SDL_HWSURFACE | SDL_FULLSCREEN);
 
 		const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
 
@@ -20,8 +20,7 @@ void SDL::init() {
 		SCREEN_Y = videoInfo->current_h;
 	}
 	else {
-		//screen = SDL_SetVideoMode(SOURCE_X * (RESIZE_X / SAMPLE_X), SOURCE_Y * (RESIZE_Y / SAMPLE_Y), 32, SDL_SWSURFACE);
-		screen = SDL_SetVideoMode(SCREEN_X, SCREEN_Y, 32, SDL_SWSURFACE);
+		screen = SDL_SetVideoMode(SCREEN_X, SCREEN_Y, 32, SDL_ANYFORMAT | SDL_HWSURFACE);
 	}
 	SDL_Flip(screen);
 }

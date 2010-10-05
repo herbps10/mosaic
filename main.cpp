@@ -1,4 +1,5 @@
 #include "mpi.h"
+
 #include <vector>
 #include <iostream>
 #include <map>
@@ -53,25 +54,23 @@ void loop() {
 int main(int argc, char* args[]) {
 	SDL::getInstance().init();
 
+	string file = "/opt/mosaic/sources/flower.jpg";
+	ImageDatabase* database = new ImageDatabase();
 
-	// Initialize MPI
 	MPI_Init(&argc, &args);
 
-	// Find out how many nodes there are and which one we are
-	int node, numNodes;
-	MPI_Comm_rank(MPI_COMM_WORLD, &node);
+	int numNodes, node;
+	
 	MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
-
-	string file = "sources/flower.jpg";
-	ImageDatabase* database = new ImageDatabase();
+	MPI_Comm_rank(MPI_COMM_WORLD, &node);
 
 	mosaic(file, node, numNodes, database);
 
 	// Loop for events
-	loop();
+	//loop();
+	SDL_Delay(5000);
 
 	MPI_Finalize();
-
 	SDL_Quit();
 
 	return 0;
@@ -83,7 +82,6 @@ void mosaic(string file, int node, int numNodes, ImageDatabase* database) {
 
 	// Load the source image
 	CImg<int> sourceImage(file.c_str());
-	
 
 	Image* source = new Image();
 	source->loadCImg(sourceImage);
@@ -94,6 +92,8 @@ void mosaic(string file, int node, int numNodes, ImageDatabase* database) {
 	//Figure out where we are on the video wall
 	wallRow = node % 4; // This is 0 indexed, so values will range from 0-3
 	wallColumn = node / 4; // Again, 0 indexed
+
+	printf("%i %i\n", wallRow, wallColumn);
 
 	cropWidth = source->width() / 4;
 	cropHeight = source->height() / 4;
