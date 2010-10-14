@@ -83,7 +83,7 @@ string ImageDatabase::colorPath(string hex, int variant) {
 	return "images/" + hex + "-" + out.str() + ".jpg";
 }
 
-static void ImageDatabase::roundColor(int& r, int& g, int& b) {
+void ImageDatabase::roundColor(int& r, int& g, int& b) {
 	// Round each number to the closest multiple of 16.
 	r = (r + 8) - ((r + 8) % 16);
 	g = (g + 8) - ((g + 8) % 16);
@@ -94,7 +94,7 @@ static void ImageDatabase::roundColor(int& r, int& g, int& b) {
 	if(b >= 256) b = 240;
 }
 
-static string ImageDatabase::rgbToHex(int r, int g, int b) {
+string ImageDatabase::rgbToHex(int r, int g, int b) {
 	string result = "";
 	int colors [] = {r, g, b};		
 
@@ -111,7 +111,7 @@ static string ImageDatabase::rgbToHex(int r, int g, int b) {
 /**
  * Converts a single digit integer (0-15) to its hex equivalent.
  */
-static string ImageDatabase::digitToHex(int n) {
+string ImageDatabase::digitToHex(int n) {
 	string alphabet [] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 	
 	return alphabet[n];
