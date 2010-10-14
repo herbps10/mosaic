@@ -15,10 +15,13 @@ int RESIZE_Y = 10;
 int SCREEN_X = 1280; 
 int SCREEN_Y = 1024; 
 
-const bool FULLSCREEN = false;
+bool FULLSCREEN = true;
 
 // Whether to add the hex value to each image so you can see which color it is
-const bool COLOR_DEBUG = false;
+bool COLOR_DEBUG = false;
 
 // Whether to draw each image individually or wait until the calculations are completely done and draw it all at once
-const bool DRAW_EACH = false;
+bool DRAW_EACH = false;
+
+const int WALL_ROWS = 2; // the number of rows of screens in the wall
+const int WALL_COLUMNS = 2; // The number of columns in the wall

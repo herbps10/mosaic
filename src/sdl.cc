@@ -24,6 +24,10 @@ void SDL::init() {
 		screen = SDL_SetVideoMode(SCREEN_X, SCREEN_Y, 32, SDL_ANYFORMAT | SDL_HWSURFACE);
 	}
 
+	if(screen == NULL) {
+		cout << "Error initializing the screen\n";
+	}
+
 	SDL_Flip(screen);
 }
 

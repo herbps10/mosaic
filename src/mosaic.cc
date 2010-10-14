@@ -40,14 +40,8 @@ void Mosaic::addImage(int column, int row, Image image) {
  */
 void Mosaic::draw() {
 	for(int r = 0; r < numRows; r++) {
-		// Make sure we don't overrun the screen vertically. r * imageHeight gives us the upper hand coordinate of the image -- add imageHeight so we can get the lower coordinate
-		if((r * imageHeight + imageHeight) < SCREEN_Y) {
-			for(int c = 0; c < numColumns; c++) {
-				// Make sure we don't run off the right edge of the screen. c * imageWidth gives us the left side coordinate, add imageWidth to get the right side
-				if((c * imageWidth + imageWidth) < SCREEN_X) {
-					images[r][c].drawImage(c * imageWidth, r * imageHeight);
-				}
-			}
+		for(int c = 0; c < numColumns; c++) {
+			images[r][c].drawImage(c * imageWidth, r * imageHeight);
 		}
 	}
 

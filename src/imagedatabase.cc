@@ -10,9 +10,14 @@ ImageDatabase::ImageDatabase() {
  * int color - an SDL mapped color value to search for
  */
 Image ImageDatabase::closestImage(int color) {
+	
 	// Extract the RGB values from the color parameter
+	SDL_Color extractedColor;
 	int r, g, b;
-	SDL_GetRGB(color, SDL::getInstance().screen->format, (Uint8 *)&r, (Uint8 *)&g, (Uint8 *)&b);
+	SDL_GetRGB(color, SDL::getInstance().screen->format, &extractedColor.r, &extractedColor.g, &extractedColor.b);
+	r = (int)extractedColor.r;
+	g = (int)extractedColor.g;
+	b = (int)extractedColor.b;
 
 	/* Summary: This randomizes what image is returned.
 	   Explanation: Sometimes in the source image there are several samples that have very similar color averages. Since we don't have very much variety in the image library, that means that the same replacement image will be used multiple times in a small area. While this isn't necessarily a bad thing, it looks somewhat ugly. To avoid this, we can try to randomize what image is returned. The following code will randomly change the color of a pixel one half of the time. This means that instead of choosing the "correct" replacement image for that sample, it will choose one that is of a slightly different color. */
@@ -51,23 +56,20 @@ Image ImageDatabase::closestImage(int color) {
 	}
 	else {
 		string file = colorPath(hex, variant);
-
 		cimg_library::CImg<int> img(file.c_str());
 
-		/*
-		Color debugging will write the average color of the image onto the image.
-		*/
-		if(COLOR_DEBUG == true) {
-			unsigned int black[] = {0, 0, 0};
-			img.draw_text(20, 20, hex.c_str(), black);
-		}
-		
 		Image* image = new Image();
-
 		image->loadCImg(img);
 
 		if(RESIZE_IMAGES == true) {
 			image->resizeToConfig(); // This function resizes the replacement images to the size specified in config.h
+		}
+		
+		/*
+		Color debugging will write the average color of the image onto the image
+		*/
+		if(COLOR_DEBUG == true) {
+			image->addText(hex);
 		}
 
 		// Add the image to the cache
@@ -83,7 +85,7 @@ string ImageDatabase::colorPath(string hex, int variant) {
 	return "images/" + hex + "-" + out.str() + ".jpg";
 }
 
-static void ImageDatabase::roundColor(int& r, int& g, int& b) {
+void ImageDatabase::roundColor(int& r, int& g, int& b) {
 	// Round each number to the closest multiple of 16.
 	r = (r + 8) - ((r + 8) % 16);
 	g = (g + 8) - ((g + 8) % 16);
@@ -94,7 +96,7 @@ static void ImageDatabase::roundColor(int& r, int& g, int& b) {
 	if(b >= 256) b = 240;
 }
 
-static string ImageDatabase::rgbToHex(int r, int g, int b) {
+string ImageDatabase::rgbToHex(int r, int g, int b) {
 	string result = "";
 	int colors [] = {r, g, b};		
 
@@ -111,7 +113,7 @@ static string ImageDatabase::rgbToHex(int r, int g, int b) {
 /**
  * Converts a single digit integer (0-15) to its hex equivalent.
  */
-static string ImageDatabase::digitToHex(int n) {
+string ImageDatabase::digitToHex(int n) {
 	string alphabet [] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 	
 	return alphabet[n];

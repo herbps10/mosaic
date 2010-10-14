@@ -34,7 +34,6 @@ void loop() {
 	bool quit = false;
 	SDL_Event event;
 
-
 	while(quit == false) {
 		while(SDL_PollEvent(&event)) {
 			// This only responds to Ctrl-C as far as I can tell
@@ -52,9 +51,11 @@ void loop() {
 }
 
 int main(int argc, char* args[]) {
+	// The input image should be the first parameter passed to the program
+	string file = args[1];
+
 	SDL::getInstance().init();
 
-	string file = "/opt/mosaic/sources/flower.jpg";
 	ImageDatabase* database = new ImageDatabase();
 
 	MPI_Init(&argc, &args);
@@ -67,8 +68,7 @@ int main(int argc, char* args[]) {
 	mosaic(file, node, numNodes, database);
 
 	// Loop for events
-	//loop();
-	SDL_Delay(5000);
+	loop();
 
 	MPI_Finalize();
 	SDL_Quit();
@@ -77,7 +77,7 @@ int main(int argc, char* args[]) {
 }
 
 void mosaic(string file, int node, int numNodes, ImageDatabase* database) {
-	//Clear the screen
+	// Clear the screen
 	SDL_FillRect(SDL::getInstance().screen, NULL, SDL_MapRGB(SDL::getInstance().screen->format, 0, 0, 0));
 
 	// Load the source image
@@ -89,14 +89,12 @@ void mosaic(string file, int node, int numNodes, ImageDatabase* database) {
 	// Crop out the part of the image that this node needs to draw
 	int startX, startY, cropWidth, cropHeight, wallRow, wallColumn;
 
-	//Figure out where we are on the video wall
-	wallRow = node % 4; // This is 0 indexed, so values will range from 0-3
-	wallColumn = node / 4; // Again, 0 indexed
+	// Figure out where we are on the video wall
+	wallRow = node / WALL_ROWS; // This is 0 indexed, so values will range from 0-3
+	wallColumn = node % WALL_COLUMNS; // Again, 0 indexed
 
-	printf("%i %i\n", wallRow, wallColumn);
-
-	cropWidth = source->width() / 4;
-	cropHeight = source->height() / 4;
+	cropWidth = source->width() / WALL_COLUMNS;
+	cropHeight = source->height() / WALL_ROWS;
 
 	startX = wallColumn * cropWidth;
 	startY = wallRow * cropHeight;
@@ -109,6 +107,11 @@ void mosaic(string file, int node, int numNodes, ImageDatabase* database) {
 	// Figure out what size we need to resize the library images to in order to fit in the entire width of the source image
 	RESIZE_X = SCREEN_X / numX;
 	RESIZE_Y = RESIZE_X; // Keep the resized image square
+
+	if(RESIZE_Y * numY < SCREEN_Y) {
+		RESIZE_Y = SCREEN_Y / numY;
+		RESIZE_X = RESIZE_Y;
+	}
 
 	// Explanation of parameters to Mosaic constructor
 	// numX - number of images across
@@ -123,7 +126,7 @@ void mosaic(string file, int node, int numNodes, ImageDatabase* database) {
 		for(int y = 0; y < numY; y++) {
 			// Average the sample segment of the source image.
 			// and find the closest match in the image database
-			averageColor = source->average(x * SAMPLE_X, y * SAMPLE_Y, RESIZE_X, RESIZE_Y);
+			averageColor = source->average((x * SAMPLE_X) + startX, (y * SAMPLE_Y) + startY, RESIZE_X, RESIZE_Y);
 			replacement = database->closestImage(averageColor);
 
 			m->addImage(x, y, replacement);

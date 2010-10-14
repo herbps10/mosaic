@@ -14,4 +14,5 @@ class Image {
 	void resizeToConfig();
 	int width();
 	int height();
+	void addText(string str);
 };

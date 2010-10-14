@@ -72,3 +72,8 @@ int Image::width() {
 int Image::height() {
 	return image.height();
 }
+
+void Image::addText(string str) {
+	unsigned int black[] = {0, 0, 0};
+	image.draw_text(5, 5, str.c_str(), black);
+}
